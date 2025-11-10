@@ -1,0 +1,77 @@
+use EmployeeDB;
+
+db.createCollection("employees", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["name", "age", "department", "salary"],
+      properties: {
+        name: { bsonType: "string", description: "must be a string" },
+        age: { bsonType: "int", description: "must be an integer" },
+        department: { bsonType: "string", description: "must be a string" },
+        salary: { bsonType: "double", description: "must be a number" }
+      }
+    }
+  },
+  validationAction: "error"
+});
+
+
+
+db.employees.insertOne({ name: "Manish", age: 25, department: "IT", salary: 50000 });
+
+
+
+db.employees.insertMany([
+  { name: "Asha", age: 30, department: "HR", salary: 45000 },
+  { name: "Ravi", age: 28, department: "Finance", salary: 48000 },
+  { name: "Sneha", age: 35, department: "IT", salary: 60000 }
+]);
+
+
+db.employees.deleteOne({ name: "Ravi" });     // delete single employee
+db.employees.deleteMany({ department: "HR" }); // delete all HR employees
+
+
+
+db.employees.replaceOne(
+  { name: "Sneha" },
+  { name: "Sneha", age: 36, department: "IT", salary: 62000 }
+);
+
+db.employees.updateOne({ name: "Manish" }, { $set: { salary: 55000 } });
+db.employees.updateMany({ department: "IT" }, { $inc: { salary: 2000 } });
+
+
+db.employees.updateOne(
+  { name: "Kiran" },
+  { $set: { age: 29, department: "Finance", salary: 47000 } },
+  { upsert: true }
+);
+
+db.employees.findOneAndUpdate(
+  { name: "Manish" },
+  { $set: { salary: 58000 } },
+  { returnDocument: "after" }
+);
+
+
+db.employees.find().limit(3);             // show first 3 employees
+db.employees.find().skip(1);              // skip first 1 record
+db.employees.find().sort({ salary: -1 }); // sort by salary (high to low)
+db.employees.find({ department: "IT" }, { name: 1, salary: 1, _id: 0 }); // show only name & salary
+
+
+db.employees.find({}, { name: 1, salary: 1, _id: 0 })
+            .sort({ salary: -1 })
+            .skip(2)
+            .limit(2);
+
+
+
+
+
+
+
+
+
