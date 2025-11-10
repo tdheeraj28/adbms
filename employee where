@@ -1,0 +1,43 @@
+db.employees.insertMany([
+  { name: "Manish", age: 25, department: "IT", salary: 55000, skills: ["Java", "Python"] },
+  { name: "Asha", age: 30, department: "HR", salary: 45000, skills: ["Communication", "Excel"] },
+  { name: "Ravi", age: 28, department: "Finance", salary: 48000, skills: ["Accounts", "Excel"] },
+  { name: "Sneha", age: 36, department: "IT", salary: 62000, skills: ["Python", "ML"] },
+  { name: "Kiran", age: 29, department: "Finance", salary: 47000, skills: ["Finance", "Excel"] },
+  { name: "Rahul", age: null, department: "IT", salary: 40000, skills: [] }
+]);
+
+
+db.employees.find();
+
+
+db.employees.findOne({ name: "Manish" });
+
+
+db.employees.find({ salary: { $gt: 50000 } });   // salary > 50000
+db.employees.find({ age: { $lt: 30 } });         // age < 30
+
+
+db.employees.find({ $or: [ { department: "IT" }, { department: "Finance" } ] });
+
+
+db.employees.find({ salary: { $not: { $gt: 60000 } } });
+
+
+db.employees.find({ department: "IT", salary: { $gte: 50000, $lte: 60000 } });
+
+
+db.employees.find({ age: null });
+
+
+db.employees.find({ name: { $regex: /^S/i } });
+
+db.employees.find({ skills: "Python" });
+
+db.employees.find({ skills: { $all: ["Python", "ML"] } });
+
+db.employees.find({ $where: "this.salary > this.age * 1000" });
+
+
+
+
