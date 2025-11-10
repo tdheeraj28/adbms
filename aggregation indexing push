@@ -1,0 +1,77 @@
+use ShopDB;
+db.orders.drop();
+db.orders.insertMany([
+  { orderid: 1, custid: "C101", date: ISODate("2025-11-01"), amount: 2000 },
+  { orderid: 2, custid: "C102", date: ISODate("2025-11-02"), amount: 1500 },
+  { orderid: 3, custid: "C101", date: ISODate("2025-11-03"), amount: 1800 },
+  { orderid: 4, custid: "C103", date: ISODate("2025-11-04"), amount: 2200 },
+  { orderid: 5, custid: "C102", date: ISODate("2025-11-05"), amount: 1300 },
+  { orderid: 6, custid: "C101", date: ISODate("2025-11-06"), amount: 2500 },
+  { orderid: 7, custid: "C103", date: ISODate("2025-11-07"), amount: 800  },
+  { orderid: 8, custid: "C104", date: ISODate("2025-11-08"), amount: 3000 }
+]);
+db.orders.createIndex({ custid: 1 });
+db.orders.createIndex({ date: 1 });
+
+// total per customer
+db.orders.aggregate([{ $group: { _id: "$custid", totalAmount: { $sum: "$amount" } } }, { $sort: { totalAmount: -1 } }]);
+
+// min/max/avg/count per customer
+db.orders.aggregate([{ $group: { _id: "$custid", total: { $sum: "$amount" }, minAmount: { $min: "$amount" }, maxAmount: { $max: "$amount" }, avgAmount: { $avg: "$amount" }, countOrders: { $sum: 1 } } }]);
+
+// first/last per customer (sorted by date)
+db.orders.aggregate([{ $sort: { custid: 1, date: 1 } }, { $group: { _id: "$custid", firstOrderDate: { $first: "$date" }, lastOrderDate: { $last: "$date" }, firstAmount: { $first: "$amount" }, lastAmount: { $last: "$amount" } } }]);
+
+// push & addToSet examples
+db.orders.aggregate([{ $group: { _id: "$custid", allAmounts: { $push: "$amount" }, uniqueAmounts: { $addToSet: "$amount" } } }]);
+
+// overall global stats
+db.orders.aggregate([{ $group: { _id: null, totalAll: { $sum: "$amount" }, minAll: { $min: "$amount" }, maxAll: { $max: "$amount" }, avgAll: { $avg: "$amount" }, totalOrders: { $sum: 1 } } }]);
+
+
+
+
+Aggregation is a process of analyzing and transforming data in collections to produce summarized results.
+It works like the GROUP BY clause in SQL.
+MongoDB provides an Aggregation Pipeline, where documents pass through multiple stages ($match, $group, $sort, etc.) to produce results.
+
+Q2. What is the difference between aggregation and MapReduce?
+
+Answer:
+
+Aggregation: Faster, built-in pipeline operators (e.g., $sum, $avg).
+
+MapReduce: JavaScript-based, more flexible but slower.
+
+Use aggregation for common queries; MapReduce for complex computations.
+
+Q3. What are the main stages in an aggregation pipeline?
+
+Answer:
+
+$match – filters documents.
+
+$group – groups documents and performs calculations.
+
+$sort – sorts the results.
+
+$project – selects specific fields or reshapes documents.
+
+$limit / $skip – controls number of output documents.
+
+$unwind – breaks arrays into separate documents.
+
+Q4. What is the purpose of $group in aggregation?
+
+Answer:
+$group is used to group documents by a field and perform aggregate operations like sum, count, min, max, avg, etc.
+
+Example:
+
+{ $group: { _id: "$custid", totalAmount: { $sum: "$amount" } } }
+
+Q5. What is _id inside $group?
+
+Answer:
+_id represents the grouping key — the field by which documents are grouped.
+If _id: null, all documents are grouped together (a single group).
