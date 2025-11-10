@@ -1,0 +1,98 @@
+1️⃣ Create Database & Collections
+use LibraryDB;
+
+// Books Collection - batch insert
+db.books.insertMany([
+  {_id:1, title:"MongoDB Basics", author:"Alice", category:"Database", year:2020, copies:5},
+  {_id:2, title:"Learning Python", author:"Bob", category:"Programming", year:2019, copies:3},
+  {_id:3, title:"JavaScript Essentials", author:"Alice", category:"Programming", year:2021, copies:2},
+  {_id:4, title:"Data Structures", author:"Charlie", category:"CS", year:2018, copies:4},
+  {_id:5, title:"Machine Learning", author:"Bob", category:"AI", year:2022, copies:1}
+]);
+
+// Members Collection
+db.members.insertMany([
+  {_id:1, name:"John", age:25, borrowed_books:[1,3]},
+  {_id:2, name:"Jane", age:30, borrowed_books:[2]},
+  {_id:3, name:"Mike", age:22, borrowed_books:[]}
+]);
+
+
+✅ Insert validation (example: category must be string) can be set using schema validation:
+
+db.createCollection("books", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["title","author","category","year","copies"],
+      properties: {
+        title: {bsonType: "string"},
+        author: {bsonType: "string"},
+        category: {bsonType: "string"},
+        year: {bsonType: "int"},
+        copies: {bsonType: "int", minimum:0}
+      }
+    }
+  }
+});
+
+2️⃣ Removing Documents
+// Remove a single book
+db.books.deleteOne({title:"Machine Learning"});
+
+// Remove multiple members below age 25
+db.members.deleteMany({age: {$lt:25}});
+
+3️⃣ Updating Documents
+a. Document Replacement
+// Replace a document entirely
+db.books.replaceOne(
+  {title:"Learning Python"},
+  {_id:2, title:"Learning Python Advanced", author:"Bob", category:"Programming", year:2021, copies:5}
+);
+
+b. Using Modifiers ($set, $inc, etc.)
+// Update single field
+db.books.updateOne(
+  {title:"MongoDB Basics"},
+  {$set: {copies: 10}}
+);
+
+// Increment copies
+db.books.updateOne(
+  {title:"JavaScript Essentials"},
+  {$inc: {copies:3}}
+);
+
+c. Upsert (insert if not exists)
+db.books.updateOne(
+  {title:"Data Science Intro"},
+  {$set: {author:"Eve", category:"AI", year:2023, copies:2}},
+  {upsert:true}
+);
+
+d. Update multiple documents
+db.books.updateMany(
+  {category:"Programming"},
+  {$set: {category:"Programming Languages"}}
+);
+
+e. Return updated documents
+db.books.findOneAndUpdate(
+  {title:"MongoDB Basics"},
+  {$set:{copies:12}},
+  {returnDocument:"after"}
+);
+
+4️⃣ Cursors (Limit, Skip, Sort, Advanced Queries)
+// Limit
+db.books.find().limit(2);
+
+// Skip
+db.books.find().skip(1);
+
+// Sort by year descending
+db.books.find().sort({year:-1});
+
+// Advanced query: find books with copies > 3, sorted by title, skip first, limit 2
+db.books.find({copies: {$gt:3}}).sort({title:1}).skip(1).limit(2);
