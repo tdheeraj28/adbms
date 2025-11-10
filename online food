@@ -1,0 +1,82 @@
+star
+
+// Dimensions
+db.customers.insertMany([
+  {_id:1,name:"Alice",city:"Delhi"},
+  {_id:2,name:"Bob",city:"Mumbai"}
+]);
+
+db.restaurants.insertMany([
+  {_id:1,name:"Pizza Hub",location:"Delhi"},
+  {_id:2,name:"Burger Zone",location:"Mumbai"}
+]);
+
+db.menu_items.insertMany([
+  {_id:1,name:"Cheese Pizza",price:400,restaurant_id:1},
+  {_id:2,name:"Veg Burger",price:200,restaurant_id:2}
+]);
+
+db.delivery_agents.insertMany([
+  {_id:1,name:"Ravi"},
+  {_id:2,name:"Suresh"}
+]);
+
+db.time.insertMany([
+  {_id:1,date:"2025-11-10",day:"Mon",month:"Nov",year:2025}
+]);
+
+// Fact
+db.orders.insertMany([
+  {order_id:1,customer_id:1,restaurant_id:1,item_id:1,delivery_id:1,time_id:1,quantity:2,total:800,status:"Delivered"},
+  {order_id:2,customer_id:2,restaurant_id:2,item_id:2,delivery_id:2,time_id:1,quantity:1,total:200,status:"Delivered"}
+]);
+
+❄ snowflake
+
+
+db.cities.insertMany([
+  {_id:1,name:"Delhi"},
+  {_id:2,name:"Mumbai"}
+]);
+
+db.customers.insertMany([
+  {_id:1,name:"Alice",city_id:1},
+  {_id:2,name:"Bob",city_id:2}
+]);
+
+db.restaurants.insertMany([
+  {_id:1,name:"Pizza Hub",city_id:1},
+  {_id:2,name:"Burger Zone",city_id:2}
+]);
+
+db.menu_items.insertMany([
+  {_id:1,name:"Cheese Pizza",price:400,restaurant_id:1},
+  {_id:2,name:"Veg Burger",price:200,restaurant_id:2}
+]);
+
+db.delivery_agents.insertMany([
+  {_id:1,name:"Ravi"},
+  {_id:2,name:"Suresh"}
+]);
+
+db.time.insertMany([
+  {_id:1,date:"2025-11-10",month:"Nov",year:2025}
+]);
+
+db.orders.insertMany([
+  {order_id:1,customer_id:1,restaurant_id:1,item_id:1,delivery_id:1,time_id:1,total:800},
+  {order_id:2,customer_id:2,restaurant_id:2,item_id:2,delivery_id:2,time_id:1,total:200}
+]);
+
+
+
+
+
+
+
+
+
+
+
+
+
