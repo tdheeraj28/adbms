@@ -1,0 +1,78 @@
+// Use or create database
+use PopulationDB
+
+// Create collection
+db.createCollection("Population")
+
+// Insert sample data
+db.Population.insertMany([
+  { CountryId: 1, StateId: 101, City: "Mumbai", Year: 2020, Population: 12442373 },
+  { CountryId: 1, StateId: 101, City: "Mumbai", Year: 2021, Population: 12691836 },
+  { CountryId: 1, StateId: 102, City: "Pune", Year: 2020, Population: 9426959 },
+  { CountryId: 1, StateId: 102, City: "Pune", Year: 2021, Population: 9568912 },
+  { CountryId: 1, StateId: 103, City: "Nagpur", Year: 2020, Population: 3512993 },
+  { CountryId: 1, StateId: 103, City: "Nagpur", Year: 2021, Population: 3594012 },
+  { CountryId: 2, StateId: 201, City: "New York", Year: 2020, Population: 8419600 },
+  { CountryId: 2, StateId: 201, City: "New York", Year: 2021, Population: 8467513 },
+  { CountryId: 2, StateId: 202, City: "Los Angeles", Year: 2020, Population: 3980400 },
+  { CountryId: 2, StateId: 202, City: "Los Angeles", Year: 2021, Population: 4015940 }
+])
+
+//--------------------------------------------//
+// 🔹 AGGREGATION PIPELINES
+//--------------------------------------------//
+
+// 1️⃣ Sum of population per country
+db.Population.aggregate([
+  { $group: { _id: "$CountryId", TotalPopulation: { $sum: "$Population" } } }
+])
+
+// 2️⃣ Minimum population per country
+db.Population.aggregate([
+  { $group: { _id: "$CountryId", MinPopulation: { $min: "$Population" } } }
+])
+
+// 3️⃣ Maximum population per country
+db.Population.aggregate([
+  { $group: { _id: "$CountryId", MaxPopulation: { $max: "$Population" } } }
+])
+
+// 4️⃣ Average population per country
+db.Population.aggregate([
+  { $group: { _id: "$CountryId", AvgPopulation: { $avg: "$Population" } } }
+])
+
+// 5️⃣ Count number of cities per country
+db.Population.aggregate([
+  { $group: { _id: "$CountryId", TotalCities: { $count: {} } } }
+])
+
+// 6️⃣ First record per country (based on insertion order)
+db.Population.aggregate([
+  { $group: { _id: "$CountryId", FirstRecord: { $first: "$City" } } }
+])
+
+// 7️⃣ Last record per country
+db.Population.aggregate([
+  { $group: { _id: "$CountryId", LastRecord: { $last: "$City" } } }
+])
+
+// 8️⃣ Push all city names per country (may contain duplicates)
+db.Population.aggregate([
+  { $group: { _id: "$CountryId", Cities: { $push: "$City" } } }
+])
+
+// 9️⃣ Add unique city names per country (no duplicates)
+db.Population.aggregate([
+  { $group: { _id: "$CountryId", UniqueCities: { $addToSet: "$City" } } }
+])
+
+//--------------------------------------------//
+// 🔹 INDEXING
+//--------------------------------------------//
+
+// Create an index on CountryId and StateId for faster search
+db.Population.createIndex({ CountryId: 1, StateId: 1 })
+
+// View all indexes
+db.Population.getIndexes()
