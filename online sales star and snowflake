@@ -1,0 +1,64 @@
+// Use database
+use OnlineSalesDB
+
+//-------------------------------------//
+// ⭐ STAR SCHEMA MODEL
+//-------------------------------------//
+// Fact Table: Sales
+db.Sales.insertMany([
+  { SaleID: 1, ProductID: 101, CustomerID: 201, StoreID: 301, DateID: 401, Quantity: 2, TotalAmount: 4000 },
+  { SaleID: 2, ProductID: 102, CustomerID: 202, StoreID: 302, DateID: 402, Quantity: 1, TotalAmount: 2500 },
+  { SaleID: 3, ProductID: 103, CustomerID: 203, StoreID: 301, DateID: 403, Quantity: 3, TotalAmount: 7500 }
+])
+
+// Dimension Tables
+db.Product.insertMany([
+  { ProductID: 101, Name: "Laptop", Category: "Electronics", Price: 2000 },
+  { ProductID: 102, Name: "Smartphone", Category: "Electronics", Price: 2500 },
+  { ProductID: 103, Name: "Washing Machine", Category: "Home Appliance", Price: 2500 }
+])
+
+db.Customer.insertMany([
+  { CustomerID: 201, Name: "Aarav", City: "Pune", Gender: "Male" },
+  { CustomerID: 202, Name: "Isha", City: "Mumbai", Gender: "Female" },
+  { CustomerID: 203, Name: "Rohan", City: "Delhi", Gender: "Male" }
+])
+
+db.Store.insertMany([
+  { StoreID: 301, Name: "Reliance Digital", Location: "Pune" },
+  { StoreID: 302, Name: "Croma", Location: "Mumbai" }
+])
+
+db.Date.insertMany([
+  { DateID: 401, Date: "2025-11-01", Month: "November", Year: 2025 },
+  { DateID: 402, Date: "2025-11-02", Month: "November", Year: 2025 },
+  { DateID: 403, Date: "2025-11-03", Month: "November", Year: 2025 }
+])
+
+//-------------------------------------//
+// ❄️ SNOWFLAKE SCHEMA MODEL
+//-------------------------------------//
+// Split Product into Subcategory and Category
+db.Category.insertMany([
+  { CategoryID: 1, CategoryName: "Electronics" },
+  { CategoryID: 2, CategoryName: "Home Appliance" }
+])
+
+db.SubCategory.insertMany([
+  { SubCatID: 11, SubCatName: "Laptop", CategoryID: 1 },
+  { SubCatID: 12, SubCatName: "Smartphone", CategoryID: 1 },
+  { SubCatID: 13, SubCatName: "Washing Machine", CategoryID: 2 }
+])
+
+// Product now references SubCategory
+db.Product_Snowflake.insertMany([
+  { ProductID: 101, SubCatID: 11, Price: 2000 },
+  { ProductID: 102, SubCatID: 12, Price: 2500 },
+  { ProductID: 103, SubCatID: 13, Price: 2500 }
+])
+
+// Fact table remains same, but connected to normalized dimensions
+db.Sales_Snowflake.insertMany([
+  { SaleID: 1, ProductID: 101, CustomerID: 201, StoreID: 301, DateID: 401, Quantity: 2, TotalAmount: 4000 },
+  { SaleID: 2, ProductID: 102, CustomerID: 202, StoreID: 302, DateID: 402, Quantity: 1, TotalAmount: 2500 }
+])
