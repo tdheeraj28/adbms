@@ -1,0 +1,63 @@
+// 1️⃣ Use database
+use UniversityDB
+
+// 2️⃣ Create & Insert documents
+db.UnitTest.insertMany([
+  { TestId: 1, StudentId: "S101", year: 2023, totalmarks: 78 },
+  { TestId: 2, StudentId: "S102", year: 2023, totalmarks: 85 },
+  { TestId: 3, StudentId: "S101", year: 2024, totalmarks: 90 },
+  { TestId: 4, StudentId: "S103", year: 2024, totalmarks: 70 },
+  { TestId: 5, StudentId: "S102", year: 2024, totalmarks: 88 },
+  { TestId: 6, StudentId: "S101", year: 2025, totalmarks: 95 }
+])
+
+// 3️⃣ Aggregation Examples
+
+// a) SUM of total marks per Student
+db.UnitTest.aggregate([
+  { $group: { _id: "$StudentId", totalSum: { $sum: "$totalmarks" } } }
+])
+
+// b) MIN marks per Student
+db.UnitTest.aggregate([
+  { $group: { _id: "$StudentId", minMarks: { $min: "$totalmarks" } } }
+])
+
+// c) MAX marks per Student
+db.UnitTest.aggregate([
+  { $group: { _id: "$StudentId", maxMarks: { $max: "$totalmarks" } } }
+])
+
+// d) AVERAGE marks per Student
+db.UnitTest.aggregate([
+  { $group: { _id: "$StudentId", avgMarks: { $avg: "$totalmarks" } } }
+])
+
+// e) COUNT total tests per Student
+db.UnitTest.aggregate([
+  { $group: { _id: "$StudentId", totalTests: { $count: {} } } }
+])
+
+// f) FIRST record (by insertion order)
+db.UnitTest.aggregate([
+  { $group: { _id: "$StudentId", firstRecord: { $first: "$totalmarks" } } }
+])
+
+// g) LAST record (by insertion order)
+db.UnitTest.aggregate([
+  { $group: { _id: "$StudentId", lastRecord: { $last: "$totalmarks" } } }
+])
+
+// h) PUSH all marks into an array
+db.UnitTest.aggregate([
+  { $group: { _id: "$StudentId", marksList: { $push: "$totalmarks" } } }
+])
+
+// i) ADDTOSET (unique marks only)
+db.UnitTest.aggregate([
+  { $group: { _id: "$StudentId", uniqueMarks: { $addToSet: "$totalmarks" } } }
+])
+
+// 4️⃣ Create Indexes for faster queries
+db.UnitTest.createIndex({ StudentId: 1 })
+db.UnitTest.createIndex({ year: 1 })
