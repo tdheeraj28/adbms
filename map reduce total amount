@@ -1,0 +1,84 @@
+// Step 1️⃣ — Use or create database
+use EmployeeDB;
+
+// Step 2️⃣ — Create "orders" collection and insert sample data
+db.orders.insertMany([
+  { Orderid: 1, custid: "C1", date: "2025-11-06", amount: 500 },
+  { Orderid: 2, custid: "C2", date: "2025-11-06", amount: 1000 },
+  { Orderid: 3, custid: "C1", date: "2025-11-07", amount: 200 },
+  { Orderid: 4, custid: "C2", date: "2025-11-07", amount: 1500 },
+  { Orderid: 5, custid: "C3", date: "2025-11-08", amount: 800 }
+]);
+
+// Step 3️⃣ — Define the Map Function
+var mapFunction = function() {
+  emit(this.custid, this.amount);
+};
+
+// Step 4️⃣ — Define the Reduce Function
+var reduceFunction = function(key, values) {
+  return Array.sum(values);
+};
+
+// Step 5️⃣ — Execute MapReduce to calculate total amount per customer
+db.orders.mapReduce(
+  mapFunction,
+  reduceFunction,
+  { out: "totalAmountPerCustomer" }
+);
+
+// Step 6️⃣ — View the MapReduce output
+print("=== Total Amount Per Customer ===");
+db.totalAmountPerCustomer.find().pretty();
+
+// Step 7️⃣ — Create index on custid for faster queries
+db.orders.createIndex({ custid: 1 });
+
+// Step 8️⃣ — Check existing indexes
+print("=== Indexes in Orders Collection ===");
+db.orders.getIndexes();
+
+// Step 9️⃣ — Example: Use index for quick search
+print("=== Orders of Customer C2 ===");
+db.orders.find({ custid: "C2" }).pretty();
+
+
+MapReduce is a data processing framework used in MongoDB to perform aggregation operations like summing, counting, or averaging large datasets.
+It works in two phases — Map and Reduce — similar to how Hadoop processes data.
+
+🔹 2. What are the two main functions in MapReduce?
+
+Answer:
+
+Map Function: Emits (key, value) pairs from each document.
+
+Reduce Function: Groups values by key and performs aggregation (like sum, count, etc.).
+
+🔹 3. What is the role of emit() function in MapReduce?
+
+Answer:
+emit(key, value) is used in the map function to output key-value pairs.
+Example:
+
+emit(this.custid, this.amount);
+
+
+This means we’re associating each custid with their order amount.
+
+🔹 4. What does the reduce() function do?
+
+Answer:
+It takes all values that have the same key (like all amounts for the same custid) and combines them, usually by summing, counting, or averaging them.
+
+Example:
+
+return Array.sum(values);
+
+🔹 5. What is the output of MapReduce stored as?
+
+Answer:
+The output is stored as a new collection (defined in the out option) or returned directly if out: { inline: 1 }.
+
+Example:
+
+{ out: "totalAmountPerCustomer" }
