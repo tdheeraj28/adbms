@@ -1,0 +1,54 @@
+1️⃣ Create Database & Collections
+use LibraryDB;
+
+// Books Collection
+db.books.insertMany([
+  {_id:1, title:"MongoDB Basics", author:"Alice", category:"Database", year:2020, copies:5, tags:["database","NoSQL"]},
+  {_id:2, title:"Learning Python", author:"Bob", category:"Programming", year:2019, copies:3, tags:["python","coding"]},
+  {_id:3, title:"JavaScript Essentials", author:"Alice", category:"Programming", year:2021, copies:2, tags:["javascript","web"]},
+  {_id:4, title:"Data Structures", author:"Charlie", category:"CS", year:2018, copies:4, tags:["algorithm","cs"]},
+  {_id:5, title:"Machine Learning", author:"Bob", category:"AI", year:2022, copies:1, tags:["ml","ai"]}
+]);
+
+// Members Collection
+db.members.insertMany([
+  {_id:1, name:"John", age:25, member_since:"2021-01-10", borrowed_books:[1,3]},
+  {_id:2, name:"Jane", age:30, member_since:"2020-05-15", borrowed_books:[2]},
+  {_id:3, name:"Mike", age:22, member_since:"2022-03-12", borrowed_books:[]},
+  {_id:4, name:"Sara", age:28, member_since:"2019-11-20", borrowed_books:[4,5]}
+]);
+
+2️⃣ MongoDB Queries (10 Examples)
+A. Find and FindOne
+// 1. Find all books by author "Alice"
+db.books.find({author:"Alice"});
+
+// 2. Find one book in category "AI"
+db.books.findOne({category:"AI"});
+
+B. Query Criteria (Conditionals, OR, $not)
+// 3. Find books with copies > 3
+db.books.find({copies: {$gt:3}});
+
+// 4. Find books by "Alice" OR category "Programming"
+db.books.find({$or:[{author:"Alice"},{category:"Programming"}]});
+
+// 5. Find books NOT in category "Programming"
+db.books.find({category: {$not: {$eq:"Programming"}}});
+
+C. Type-Specific Queries (Null, Regex, Arrays)
+// 6. Find members who have not borrowed any books (empty array)
+db.members.find({borrowed_books: {$size:0}});
+
+// 7. Find books where title starts with "Data" using regex
+db.books.find({title: /^Data/});
+
+// 8. Find books containing tag "NoSQL" in array
+db.books.find({tags: "NoSQL"});
+
+D. $where Queries
+// 9. Find books where year + copies > 2025 using $where
+db.books.find({$where: "this.year + this.copies > 2025"});
+
+// 10. Find members whose age > borrowed_books.length + 20
+db.members.find({$where: "this.age > this.borrowed_books.length + 20"});
