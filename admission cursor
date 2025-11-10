@@ -1,0 +1,80 @@
+// 1️⃣ Create / Use Database
+use AdmissionDB
+
+// 2️⃣ Create Collection with Validation
+db.createCollection("Admission", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["AdmNo", "name", "course", "year", "fees"],
+      properties: {
+        AdmNo: { bsonType: "int", description: "Admission number must be integer" },
+        name: { bsonType: "string", description: "Name must be string" },
+        course: { bsonType: "string", description: "Course must be string" },
+        year: { bsonType: "int", description: "Year must be integer" },
+        fees: { bsonType: "double", description: "Fees must be a number" }
+      }
+    }
+  },
+  validationAction: "error"
+})
+
+// 3️⃣ Insert Single Document
+db.Admission.insertOne({ AdmNo: 101, name: "Aarav", course: "B.Tech", year: 2023, fees: 50000 })
+
+// 4️⃣ Batch Insert
+db.Admission.insertMany([
+  { AdmNo: 102, name: "Isha", course: "MBA", year: 2024, fees: 65000 },
+  { AdmNo: 103, name: "Rohan", course: "BCA", year: 2023, fees: 45000 },
+  { AdmNo: 104, name: "Diya", course: "MCA", year: 2024, fees: 70000 }
+])
+
+// 5️⃣ Removing Document
+db.Admission.deleteOne({ AdmNo: 103 })        // remove one
+db.Admission.deleteMany({ year: 2022 })       // remove multiple (if any)
+
+// 6️⃣ Updating Documents
+// a) Document Replacement
+db.Admission.replaceOne(
+  { AdmNo: 101 },
+  { AdmNo: 101, name: "Aarav Sharma", course: "B.Tech", year: 2023, fees: 52000 }
+)
+
+// b) Using Modifiers ($set)
+db.Admission.updateOne(
+  { AdmNo: 102 },
+  { $set: { fees: 68000 } }
+)
+
+// c) Upsert (update if exists, else insert new)
+db.Admission.updateOne(
+  { AdmNo: 105 },
+  { $set: { name: "Arjun", course: "B.Sc", year: 2025, fees: 40000 } },
+  { upsert: true }
+)
+
+// d) Update Multiple Documents
+db.Admission.updateMany(
+  { year: 2024 },
+  { $set: { scholarship: true } }
+)
+
+// e) Returning Updated Document
+db.Admission.findOneAndUpdate(
+  { AdmNo: 102 },
+  { $set: { course: "MBA - Finance" } },
+  { returnDocument: "after" }
+)
+
+// 7️⃣ Cursor Operations
+// a) Limit
+db.Admission.find().limit(3)
+
+// b) Skip
+db.Admission.find().skip(1)
+
+// c) Sort (Ascending by name)
+db.Admission.find().sort({ name: 1 })
+
+// d) Advanced Query Options — sort + limit
+db.Admission.find({ year: 2024 }).sort({ fees: -1 }).limit(2)
