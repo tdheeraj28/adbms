@@ -1,0 +1,45 @@
+// 1️⃣ Create / Use Database
+use AdmissionDB
+
+// 2️⃣ Create and Insert Documents
+db.Admission.insertMany([
+  { AdmNo: 101, name: "Aarav", course: "B.Tech", year: 2023, fees: 50000, subjects: ["Maths", "Physics"], scholarship: true },
+  { AdmNo: 102, name: "Isha", course: "MBA", year: 2024, fees: 65000, subjects: ["Finance", "Marketing"], scholarship: false },
+  { AdmNo: 103, name: "Rohan", course: "BCA", year: 2023, fees: 45000, subjects: ["Programming", "Maths"], scholarship: true },
+  { AdmNo: 104, name: "Diya", course: "MCA", year: 2024, fees: 70000, subjects: ["AI", "DBMS"], scholarship: null },
+  { AdmNo: 105, name: "Arjun", course: "B.Tech", year: 2025, fees: 55000, subjects: ["Electronics", "Maths"], scholarship: false }
+])
+
+// ----------------------
+// 🔎 10 Example Queries
+// ----------------------
+
+// 1️⃣ Find all students
+db.Admission.find()
+
+// 2️⃣ Find one student by name
+db.Admission.findOne({ name: "Aarav" })
+
+// 3️⃣ Find students with fees greater than 50000
+db.Admission.find({ fees: { $gt: 50000 } })
+
+// 4️⃣ Find students admitted in 2023 or 2024
+db.Admission.find({ $or: [ { year: 2023 }, { year: 2024 } ] })
+
+// 5️⃣ Find students not in course "MBA"
+db.Admission.find({ course: { $not: { $eq: "MBA" } } })
+
+// 6️⃣ Find students whose scholarship field is NULL
+db.Admission.find({ scholarship: null })
+
+// 7️⃣ Find students whose name starts with 'A' (Regular Expression)
+db.Admission.find({ name: { $regex: /^A/, $options: "i" } })
+
+// 8️⃣ Find students having "Maths" in their subjects array
+db.Admission.find({ subjects: "Maths" })
+
+// 9️⃣ Find students with array containing both "AI" and "DBMS"
+db.Admission.find({ subjects: { $all: ["AI", "DBMS"] } })
+
+// 🔟 $where query — find students where fees > 55000
+db.Admission.find({ $where: function() { return this.fees > 55000; } })
