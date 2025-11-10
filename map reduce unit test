@@ -1,0 +1,49 @@
+// 1️⃣ Use or create database
+use UniversityDB
+
+// 2️⃣ Create and insert sample data
+db.UnitTest.insertMany([
+  { TestId: 1, StudentId: "S101", year: 2023, totalmarks: 80 },
+  { TestId: 1, StudentId: "S102", year: 2023, totalmarks: 90 },
+  { TestId: 2, StudentId: "S103", year: 2023, totalmarks: 75 },
+  { TestId: 2, StudentId: "S104", year: 2023, totalmarks: 85 },
+  { TestId: 3, StudentId: "S105", year: 2024, totalmarks: 70 },
+  { TestId: 3, StudentId: "S106", year: 2024, totalmarks: 80 }
+])
+
+// 3️⃣ Define map and reduce functions
+var mapFunction = function() {
+  emit(this.TestId, { sum: this.totalmarks, count: 1 });
+};
+
+var reduceFunction = function(key, values) {
+  var total = 0, count = 0;
+  values.forEach(function(v) {
+    total += v.sum;
+    count += v.count;
+  });
+  return { sum: total, count: count };
+};
+
+// 4️⃣ Optional: finalize function to calculate average
+var finalizeFunction = function(key, reducedVal) {
+  reducedVal.avg = reducedVal.sum / reducedVal.count;
+  return reducedVal;
+};
+
+// 5️⃣ Run MapReduce
+db.UnitTest.mapReduce(
+  mapFunction,
+  reduceFunction,
+  {
+    out: "AvgMarksPerTest",
+    finalize: finalizeFunction
+  }
+);
+
+// 6️⃣ View the result
+db.AvgMarksPerTest.find().pretty();
+
+// 7️⃣ Create Indexes for optimization
+db.UnitTest.createIndex({ TestId: 1 });
+db.UnitTest.createIndex({ year: 1 });
