@@ -1,0 +1,61 @@
+           Dim_Student
+                |
+           Dim_Course
+                |
+Dim_Professor - Fact_Enrollment - Dim_Department
+                |
+             Dim_Time
+
+
+
+
+Dim_City ← Dim_Student → Fact_Enrollment ← Dim_Course → Dim_Department
+                                     ↑
+                              Dim_Professor
+                                     ↑
+                                Dim_Time
+
+
+use UniversityDB
+
+// Dimension Tables
+db.dimStudent.insertMany([
+  {student_id:1, name:"Aarav"}, {student_id:2, name:"Isha"}
+])
+db.dimCourse.insertMany([
+  {course_id:101, course_name:"DBMS"}, {course_id:102, course_name:"AI"}
+])
+db.dimDepartment.insertMany([
+  {dept_id:11, dept_name:"Computer Science"},
+  {dept_id:12, dept_name:"Information Tech"}
+])
+db.dimTime.insertMany([
+  {time_id:1, year:2025, semester:"Sem 5"},
+  {time_id:2, year:2025, semester:"Sem 6"}
+])
+
+// Fact Table
+db.factMarks.insertMany([
+  {student_id:1, course_id:101, dept_id:11, time_id:1, marks:85},
+  {student_id:2, course_id:101, dept_id:12, time_id:1, marks:75},
+  {student_id:1, course_id:102, dept_id:11, time_id:2, marks:90}
+])
+
+
+use UniversityDB_Snowflake
+
+db.dimFaculty.insertMany([
+  {faculty_id:201, faculty_name:"Engineering"}
+])
+db.dimDepartment.insertMany([
+  {dept_id:11, dept_name:"Computer Science", faculty_id:201},
+  {dept_id:12, dept_name:"Information Tech", faculty_id:201}
+])
+db.factMarks.insertMany([
+  {student_id:1, course_id:101, dept_id:11, time_id:1, marks:85},
+  {student_id:2, course_id:101, dept_id:12, time_id:1, marks:75}
+])
+
+db.factMarks.aggregate([
+  { $lookup: { from: "dimStudent", localField: "student_id", foreignField: "student_id", as: "student_info" } }
+])
